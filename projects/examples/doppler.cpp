@@ -19,7 +19,8 @@
 //
 //    - spd src/recv: speed of source and receivers, in m/s. + if towards the other.
 //
-//    - dist: initial distance between the two
+//    - dist: initial distance between the two. distY makes the relative speeds change as they objects get close to each other
+//             (otherwise we simply get a quick jump between two constant frequencies...)
 //
 //    - input file: input file to be processed. will be looped continuously throughout duration of simulation
 //
@@ -30,9 +31,9 @@
 //
 //
 // Sample input:
-// ./doppler 10 5 120 10 siren.wav siren_doppler.wav 0
-// will create a source and receiver travelling at 10m/s and -5m/s respectively
-// from a distance of distX=120m and distY. The simulation will end when they are dixtX=120m apart after crossing each other.
+// ./doppler 10 -15 100 10 rawwaves/siren.wav siren_doppler.wav 0
+// will create a source and receiver travelling at 10m/s and -15m/s respectively
+// from a distance of distX=120m and distY of 10m. The simulation will end when they are dixtX=120m apart after crossing each other.
 // in our internal model, we set the starting location of the source as 0, and receiver in the positive direction
 //
 //
@@ -178,14 +179,19 @@ int main(int argc, char *argv[])
     //velRelative = ( sqrt((xSrcCurr-xSrcPrev)*(xSrcCurr-xSrcPrev)+distY*distY) +
     //               sqrt((xRcvPrev-xRcvCurr)*(-xRcvCurr)+distY*distY) ) / dT;
     
-    double velRelative = ( (xRcvCurr-xSrcCurr) - (xRcvPrev-xSrcPrev) ) / dT;
+    //double velRelative = ( (xRcvCurr-xSrcCurr) - (xRcvPrev-xSrcPrev) ) / dT;
+    
+
+    //bit of a hack to get the right behaviour, as my quickly cobbled together model
+    // was bit sloppy when it came to managing the sign
+    double velRelative = -fabs( sqrt((xRcvCurr-xSrcCurr)*(xRcvCurr-xSrcCurr)+distY*distY)
+                          - sqrt((xRcvPrev-xSrcPrev)*(xRcvPrev-xSrcPrev)+distY*distY) ) / dT;
+    
     if (xRcvCurr < xSrcCurr)
-      velRelative = -velRelative; //bit of a hack for the sign here...
+      velRelative = -velRelative;
     
-        std::cout <<xSrcCurr<<"  "<<xRcvCurr<< " "<< velRelative <<"\n";
-    
-    //std::cout << velRelative <<"\n";
-    
+    //std::cout <<xSrcCurr<<"  "<<xRcvCurr<< " "<< velRelative <<"\n";
+
     xSrcPrev = xSrcCurr;
     xRcvPrev = xRcvCurr;
     
