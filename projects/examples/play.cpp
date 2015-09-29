@@ -15,6 +15,7 @@
 
 #include "FileWvIn.h"
 #include "RtAudio.h"
+#include "FileLoop.h"
 
 #include <signal.h>
 #include <iostream>
@@ -51,7 +52,8 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
   for ( unsigned int i=0; i<frames.size(); i++ )
     *samples++ = frames[i];
 
-  if ( input->isFinished() ) {
+  //if ( input->isFinished() ) {
+  if ( false ) {
     done = true;
     return 1;
   }
@@ -70,10 +72,12 @@ int main(int argc, char *argv[])
   // Initialize our WvIn and RtAudio pointers.
   RtAudio dac;
   FileWvIn input;
+  FileLoop inputLoop;
 
   // Try to load the soundfile.
   try {
     input.openFile( argv[1] );
+	inputLoop.openFile( argv[1] );
   }
   catch ( StkError & ) {
     exit( 1 );
@@ -82,6 +86,7 @@ int main(int argc, char *argv[])
   // Set input read rate based on the default STK sample rate.
   double rate = 1.0;
   rate = input.getFileRate() / Stk::sampleRate();
+  rate = inputLoop.getFileRate() / Stk::sampleRate();
   if ( argc == 4 ) rate *= atof( argv[3] );
   input.setRate( rate );
 
@@ -97,7 +102,7 @@ int main(int argc, char *argv[])
   RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
   unsigned int bufferFrames = RT_BUFFER_SIZE;
   try {
-    dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&input );
+    dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&inputLoop );
   }
   catch ( RtAudioError &error ) {
     error.printMessage();
