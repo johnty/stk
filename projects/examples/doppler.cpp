@@ -23,14 +23,14 @@ int main(int argc, char *argv[])
   double totalTime;
   unsigned long numSamples;
   
-  if ( argc < 5 || argc > 6 ) {
+  if ( argc < 6 || argc > 7 ) {
     std::cout<<"\n\n\n****Doppler shift example*****\n\n";
     std::cout<<"Will produce output assuming source is travelling towards\n";
     std::cout<<"and then past receiver in straight line\n\n";
     std::cout<<"Will start simulation at d0=-D and end at d1=+D\n";
     std::cout<<"Simulation time = 2D/(relative velocity)\n";
     std::cout<<"input will be looped for duration of simulation\n\n";
-    std::cout<< "usage: doppler [spd src (m/s)] [spd recv (m/s)] [dist (m)] [input file (wav)]\n";
+    std::cout<< "usage: doppler [spd src (m/s)] [spd recv (m/s)] [dist (m)] [input file (wav)] [0/1: no mix/mix]\n";
     std::cout<< "NOTE1: for speeds, + is towards, - is away from\n";
     std::cout<< "NOTE2: if source and receiver are diverging, fix simulation duration to 5s\n";
     return 0;
@@ -55,7 +55,6 @@ int main(int argc, char *argv[])
   // Set the global sample rate before creating class instances.
   Stk::setSampleRate( SAMPLE_RATE );
 
-  int i;
   FileWvOut outputFile;
   FileLoop inputLoop;
 
@@ -120,11 +119,11 @@ int main(int argc, char *argv[])
     write_ptr++;
     
     delay.setDelay(1+read_ptr);
-    double mix = ( (int)(read_ptr-write_ptr) % (DELAY_SIZE) ) / (double) DELAY_SIZE;
-    mix = 1;
-    std::cout << g << std::endl;
+    double mix = ( (int)(read_ptr-write_ptr) % (DELAY_SIZE) ) / (double) DELAY_SIZE ;
+    if (atoi(argv[5]) == 0)
+      mix = 1; // don't mix; otherwise, use the mixing from half delay line away...
     float outsample = mix*delay.tick(inputLoop.tick());
-    //outsample += (1-mix)*delay.tapOut(DELAY_SIZE/2);
+    outsample += (1-mix)*delay.tapOut(DELAY_SIZE/2);
     frames[i] = outsample;
   }
   std::cout<<"numWrap = " << numWrap<<"\n";
