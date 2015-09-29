@@ -62,8 +62,8 @@ audioprobe: RtAudio.o @objects@
 midiprobe: RtMidi.o
 	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o midiprobe midiprobe.cpp $(OBJECT_PATH)/RtMidi.o $(LIBRARY)
 
-play: play.cpp Stk.o FileRead.o FileWvIn.o RtAudio.o
-	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o play play.cpp $(OBJECT_PATH)/Stk.o $(OBJECT_PATH)/FileRead.o $(OBJECT_PATH)/FileWvIn.o $(OBJECT_PATH)/RtAudio.o $(LIBRARY)
+play: play.cpp Stk.o FileRead.o FileWvIn.o FileLoop.o RtAudio.o
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o play play.cpp $(OBJECT_PATH)/Stk.o $(OBJECT_PATH)/FileRead.o $(OBJECT_PATH)/FileWvIn.o $(OBJECT_PATH)/FileLoop.o $(OBJECT_PATH)/RtAudio.o $(LIBRARY)
 
 record: record.cpp Stk.o FileWrite.o FileWvOut.o RtWvIn.o RtAudio.o Mutex.o
 	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o record record.cpp $(OBJECT_PATH)/Stk.o $(OBJECT_PATH)/FileWrite.o $(OBJECT_PATH)/FileWvOut.o $(OBJECT_PATH)/RtWvIn.o $(OBJECT_PATH)/Mutex.o $(OBJECT_PATH)/RtAudio.o $(LIBRARY)
@@ -106,3 +106,8 @@ playsmf: playsmf.cpp Stk.o MidiFileIn.o RtMidi.o
 
 grains: grains.cpp Stk.o Granulate.o Noise.o FileRead.o RtAudio.o
 	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o grains grains.cpp $(OBJECT_PATH)/Stk.o $(OBJECT_PATH)/Granulate.o $(OBJECT_PATH)/Noise.o $(OBJECT_PATH)/FileRead.o $(OBJECT_PATH)/RtAudio.o $(LIBRARY)
+
+
+doppler: doppler.cpp Stk.o DelayL.o FileRead.o FileWvIn.o FileWvOut.o FileWrite.o FileLoop.o 
+	$(CC) $(LDFLAGS) $(CFLAGS) $(DEFS) -o doppler doppler.cpp $(OBJECT_PATH)/Stk.o $(OBJECT_PATH)/DelayL.o $(OBJECT_PATH)/FileRead.o $(OBJECT_PATH)/FileWvIn.o $(OBJECT_PATH)/FileWrite.o $(OBJECT_PATH)/FileWvOut.o $(OBJECT_PATH)/FileLoop.o $(OBJECT_PATH)/RtAudio.o $(LIBRARY)
+
